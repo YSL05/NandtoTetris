@@ -14,4 +14,30 @@ CHIP FullAdder {
 
     PARTS:
     // Put you code here:
+    // Not(in=a, out=nota);
+    // Not(in=b, out=notb);
+    // Not(in=c, out=notc);
+    // And(a=a, b=b, out=ab);
+    // And(a=b, b=c, out=bc);
+    // And(a=a, b=c, out=ac);
+
+    // And(a=nota, b=bc, out=notabc);
+    // And(a=notb, b=ac, out=anotbc);
+    // Or(a=ab, b=notabc, out=abornotabc);
+    // Or(a=abornotabc, b=anotbc, out=carry);
+
+    Not(in=a, out=nota);
+    Not(in=b, out=notb);
+    Not(in=c, out=notc);
+
+    And3Way(a=a, b=b, c=c, out=abc);
+    And3Way(a=nota, b=b, c=c, out=notabc);
+    And3Way(a=a, b=notb, c=c, out=anotbc);
+    And3Way(a=a, b=b, c=notc, out=abnotc);
+    Or4Way(a=abc, b=notabc, c=anotbc, d=abnotc, out=carry);
+
+    And3Way(a=nota, b=notb, c=c, out=nanbc);
+    And3Way(a=nota, b=b, c=notc, out=nabnc);
+    And3Way(a=a, b=notb, c=notc, out=anbnc);
+    Or4Way(a=abc, b=nanbc, c=nabnc, d=anbnc, out=sum);
 }

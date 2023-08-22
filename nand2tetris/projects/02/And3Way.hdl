@@ -1,0 +1,14 @@
+
+/**
+ * The and of 3 in.
+ */
+
+CHIP And3Way {
+    IN a, b, c;  // 1-bit inputs
+    OUT out;     // The and of 3 in
+
+    PARTS:
+    // Put you code here:
+    And(a=a, b=b, out=ab);
+    And(a=ab, b=c, out=out);
+}

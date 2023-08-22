@@ -1,0 +1,14 @@
+/**
+ * The or of 4 in.
+ */
+
+CHIP Or4Way {
+    IN a, b, c, d;  // 1-bit inputs
+    OUT out;     // The or of 4 in
+
+    PARTS:
+    // Put you code here:
+    Or(a=a, b=b, out=ab);
+    Or(a=ab, b=c, out=abc);
+    Or(a=abc, b=d, out=out);
+}
