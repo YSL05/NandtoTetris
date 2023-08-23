@@ -43,4 +43,27 @@ CHIP ALU {
 
     PARTS:
    // Put you code here:
+   Not(in=zx, out=nzx);
+   Xor16(a=x, b[0..15]=true, out=outx2);
+
+   Not(in=zy, out=nzy);
+   Xor16(a=y, b[0..15]=true, out=outy2);
+
+   //确定x和y的值
+   Mux4Way16(a=x, b=outx2, c[0..15]=false, d[0..15]=true, sel[1]=zx, sel[0]=nx, out=outx);
+   Mux4Way16(a=y, b=outy2, c[0..15]=false, d[0..15]=true, sel[1]=zy, sel[0]=ny, out=outy);
+   
+   //由f确定操作
+   And16(a=outx, b=outy, out=out1);
+   Add16(a=outx, b=outy, out=out2);
+   Mux16(a=out1, b=out2, sel=f, out=out3);
+
+   //由no确定输出是否取反
+   Not16(in=out3, out=out4);
+   Mux16(a=out3, b=out4, sel=no, out=out5);
+   Mux16(a=out3, b=out4, sel=no, out=out, out[15]=ng);
+
+   //确定zr的值
+   Or16Way(in=out5, out=zrsel);
+   Mux(a=true, b=false, sel=zrsel, out=zr);
 }
