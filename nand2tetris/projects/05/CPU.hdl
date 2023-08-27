@@ -40,4 +40,32 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+
+    //寄存器A，根据当前指令为A还是C指令，寄存器A加载最新的地址，或者保持之前的输出，或者存储
+    Mux16(a=inM, b=outAluforA, sel=instruction[0], out=inforA);
+    Not(in=instruction[10], out=notins10);
+    And(a=instruction[0], b=notins10, out=CtrlnotA);
+    Not(in=CtrlnotA, out=CtrlA);
+    Register(in=inforA, load=CtrlA, out[1..15]=addressM, out=outAforALU, out=outAforPC);
+
+    //寄存器D，根据C指令，确定其输入来自输入还是ALU计算
+    Register(in=outAluforD, load=instruction[11], out=outD);
+
+    //确定ALU的其中一个输入来自A寄存器还是内存输入
+    Mux16(a=outAforALU, b=inM, sel=instruction[3], out=Aorin);
+    
+    //ALU，核心计算部分
+    ALU(x=outD, y=Aorin, zx=instruction[4], nx=instruction[5], zy=instruction[6], ny=instruction[7], f=instruction[8], no=instruction[9], out=outAluforD, out=outAluforA, out=outM, zr=outzr, ng=outng);
+
+    //PC，程序计数器
+    And(a=outng, b=instruction[13], out=ngforPC);
+    And(a=outzr, b=instruction[14], out=zrforPC);
+    Xor(a=outzr, b=outng, out=xorforPC);
+    And(a=xorforPC, b=instruction[15], out=poforPC);
+    Or(a=ngforPC, b=ngforPC, out=or1);
+    Or(a=or1, b=poforPC, out=ctrlPC);
+    PC(in=outAforPC, load=ctrlPC, inc=true, reset=reset, out[1..15]=pc);
+
+    //对内存的控制
+    And(a=instruction[12], b=instruction[12], out=writeM);
 }
