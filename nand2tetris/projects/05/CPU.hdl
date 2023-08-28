@@ -42,30 +42,41 @@ CHIP CPU {
     // Put your code here:
 
     //寄存器A，根据当前指令为A还是C指令，寄存器A加载最新的地址，或者保持之前的输出，或者存储
-    Mux16(a=inM, b=outAluforA, sel=instruction[0], out=inforA);
-    Not(in=instruction[10], out=notins10);
-    And(a=instruction[0], b=notins10, out=CtrlnotA);
+    Mux16(a=instruction, b=outAluforA, sel=instruction[15], out=inforA);
+    Not(in=instruction[5], out=notins10);
+    And(a=instruction[15], b=notins10, out=CtrlnotA);
     Not(in=CtrlnotA, out=CtrlA);
-    Register(in=inforA, load=CtrlA, out[1..15]=addressM, out=outAforALU, out=outAforPC);
+    ARegister(in=inforA, load=CtrlA, out[0..14]=addressM, out=outAforALU, out=outAforPC);
 
     //寄存器D，根据C指令，确定其输入来自输入还是ALU计算
-    Register(in=outAluforD, load=instruction[11], out=outD);
+    And(a=instruction[4], b=instruction[15], out=ctrlD);
+    DRegister(in=outAluforD, load=ctrlD, out=outD);
 
     //确定ALU的其中一个输入来自A寄存器还是内存输入
-    Mux16(a=outAforALU, b=inM, sel=instruction[3], out=Aorin);
+    Mux16(a=outAforALU, b=inM, sel=instruction[12], out=Aorin);
     
     //ALU，核心计算部分
-    ALU(x=outD, y=Aorin, zx=instruction[4], nx=instruction[5], zy=instruction[6], ny=instruction[7], f=instruction[8], no=instruction[9], out=outAluforD, out=outAluforA, out=outM, zr=outzr, ng=outng);
+    //一个输入是D寄存器的输出，一个输入是地址寄存器的输入或内存的输入
+    //一个输出用于D寄存器是否存储，一个输出用于A寄存器是否存储，一个输出用于是否存到内存里
+    //还有一个关于ALU的输出是否等于0，一个输出指示ALU的输出是否小于0
+    ALU(x=outD, y=Aorin, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=outAluforD, out=outAluforA, out=outM, zr=outzr, ng=outng);
 
     //PC，程序计数器
-    And(a=outng, b=instruction[13], out=ngforPC);
-    And(a=outzr, b=instruction[14], out=zrforPC);
+    //判断是否ALU的输出是否小于0
+    And(a=outng, b=instruction[2], out=ngforPC);
+    //判断是否ALU的输出是否等于0
+    And(a=outzr, b=instruction[1], out=zrforPC);
+    //判断是否ALU的输出是否大于0
     Xor(a=outzr, b=outng, out=xorforPC);
-    And(a=xorforPC, b=instruction[15], out=poforPC);
-    Or(a=ngforPC, b=ngforPC, out=or1);
-    Or(a=or1, b=poforPC, out=ctrlPC);
-    PC(in=outAforPC, load=ctrlPC, inc=true, reset=reset, out[1..15]=pc);
+    Not(in=xorforPC, out=notxorforPC);
+    And(a=notxorforPC, b=instruction[0], out=poforPC);
+    //确定如果是C指令是否需要跳转
+    Or(a=ngforPC, b=zrforPC, out=or1);
+    Or(a=or1, b=poforPC, out=ctrlPC1);
+    //依据是否是C指令，决定是否使能jmp功能
+    And(a=instruction[15], b=ctrlPC1, out=ctrlPC);
+    PC(in=outAforPC, load=ctrlPC, inc=true, reset=reset, out[0..14]=pc);
 
     //对内存的控制
-    And(a=instruction[12], b=instruction[12], out=writeM);
+    And(a=instruction[3], b=instruction[15], out=writeM);
 }
