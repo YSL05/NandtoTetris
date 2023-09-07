@@ -107,7 +107,7 @@ class VMTranslator:
             asm_code = ["@"+command[1],"D=A","@"+self.mapping[command[0]],"D=A+D","@R15","M=D"]
         elif command[0] == "static":
             symbol="@"+self.vm_filename[:-3]+"."+command[1]
-            asm_code=[symbol,"D=M","@R15","M=D"]
+            asm_code=[symbol,"D=A","@R15","M=D"]
         
         return asm_code + ["@SP","AM=M-1","D=M","@R15","A=M","M=D"]
     

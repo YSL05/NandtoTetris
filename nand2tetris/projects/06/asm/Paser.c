@@ -1,22 +1,46 @@
 /*
 功能：解析文本文件的字符串转化为域和字段
 */
-#include "data_type.h"
+#include <stdio.h>
+#include <stdlib.h>
+//#include "data_type.h"
 
-int Paser(const char *file_name, struct asm_field cmd[])
+int paser_analysis(const char *file_name, struct asm_field *cmd)
 {
-    char *line[100];
-    char *cmd_str[100];
-    int line_size = 0;
+    char line[100][100] = {0};
+    FILE *file = fopen(file_name, "rt");
     int i = 0;
-    while(i < 30)
+    int j = 0;
+    int k = 0;
+    char temp_line;
+    while(!feof(file))
     {
-        line[i] = (char *)malloc(100);
-        i++;
+        temp_line = fgetc(file);
+        if(temp_line == '\n')
+        {
+            while (!feof(file))
+            {
+                temp_line = fgetc(file);
+                if(temp_line != '\n')
+                {
+                    *(line[i] + j) = '\0';
+                    i++;
+                    j = 0;
+                    break;
+                }
+            }
+        }
+        if (feof(file))
+        {
+            break;
+        }
+        *(line[i] + j) = temp_line;
+        j++;
     }
-    Init(file_name, line, &line_size);
-    for (i = 0; i <= line_size; i++)
+    j = 0;
+    while (j <= i)
     {
-        delete_space(line[i], cmd_str[i]);
+        printf("%s\n", line[j]);
+        j++;
     }
 }

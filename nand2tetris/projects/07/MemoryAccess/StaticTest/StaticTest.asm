@@ -20,7 +20,7 @@ M=D
 @SP
 M=M+1
 @StaticTest.8
-D=M
+D=A
 @R15
 M=D
 @SP
@@ -30,7 +30,7 @@ D=M
 A=M
 M=D
 @StaticTest.3
-D=M
+D=A
 @R15
 M=D
 @SP
@@ -40,7 +40,7 @@ D=M
 A=M
 M=D
 @StaticTest.1
-D=M
+D=A
 @R15
 M=D
 @SP
