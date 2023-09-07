@@ -120,17 +120,14 @@ class VMTranslator:
             for line in self.asm_codes:
                 file.write(line + '\n')
     
-    def main():
-        
-        file_path = sys.argv[1]
-        vmtranslator = VMTranslator(file_path)
-        vmtranslator.parse()
-        vmtranslator.save_file()
-        for line in vmtranslator.asm_codes:
-            print(line)
+def main():
+    file_path = sys.argv[1]
+    vmtranslator = VMTranslator(file_path)
+    vmtranslator.parse()
+    vmtranslator.save_file()
     
-    if __name__ == '__main__':
-        main()
+if __name__ == '__main__':
+    main()
     
 
 
