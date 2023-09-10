@@ -22,9 +22,6 @@ D=M
 A=M
 M=D
 
-//label LOOP_START
-($LOOP_START)
-
 //push argument 0
 @0
 D=A
@@ -36,6 +33,9 @@ A=M
 M=D
 @SP
 M=M+1
+
+//label LOOP_START
+($LOOP_START)
 
 //push local 0
 @0

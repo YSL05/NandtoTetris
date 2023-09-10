@@ -10,7 +10,7 @@ class VMTranslator:
         @attr self.vm_files (list of str): the xxx.vm needed to be translated
         @attr self.asm_filename(str): output filename
         @attr self.output_path(str): path for output filename
-        @attr self.symbol_insdx(int): use it to make sure that each symbol is unique
+        @attr self.symbol_index(int): use it to make sure that each symbol is unique
         @attr self.ret_index(int): use it to make sure that each ret label is unique
         """
         self.vm_files = []
@@ -30,7 +30,7 @@ class VMTranslator:
             suffix = self.vm_filename[self.vm_filename.find(".") + 1:]
             assert suffix == "vm","please choose a vm file like xxx.vm"
             self.vm_files=[file_path]
-            self.asm_filename = os.path.basename(file_path)[:-2] + ".asm"
+            self.asm_filename = os.path.basename(file_path)[:-2] + "asm"
             if file_path.find("/") == -1:
                 self.output_path = os.getcwd()
             else:
@@ -41,7 +41,6 @@ class VMTranslator:
         """
         translate the vm files in self.vm_files into assembly codes, store them into self.asm_codes
         """
-
         if self.multi:
             self.asm_codes+=["@256","D=A","@SP","M=D"] # set SP=256
             self.asm_codes+=["@1","D=A","@LCL","M=D"]
@@ -177,7 +176,7 @@ class SingleVMTranslator:
         """
         label = "End$" + command[0] + "$" + str(self.ret_index)
         self.ret_index += 1
-        push_label = ["@SP","A=M","M=D","SP","M=M+1"]
+        push_label = ["@SP","A=M","M=D","@SP","M=M+1"]
         asm_code = (["@"+ label, "D=A"] + push_label)
         for x in ["LCL","ARG","THIS","THAT"]:
             asm_code += (["@"+ x, "D=M"] + push_label)
@@ -264,7 +263,7 @@ class SingleVMTranslator:
             asm_code = ["@"+command[1],"D=A","@"+self.mapping[command[0]],"D=A+D","@R15","M=D"]
         elif command[0] == "static":
             symbol="@"+self.vm_filename[:-3]+"."+command[1]
-            asm_code=[symbol,"D=M","@R15","M=D"]
+            asm_code=[symbol,"D=A","@R15","M=D"]
         
         return asm_code + ["@SP","AM=M-1","D=M","@R15","A=M","M=D"]
 def main():
